@@ -1,0 +1,11 @@
+--- a/cmd/ubi.c
++++ b/cmd/ubi.c
+@@ -248,7 +248,7 @@ int ubi_create_vol(char *volume, int64_t
+ 	printf("Creating %s volume %s of size %lld\n",
+ 		dynamic ? "dynamic" : "static", volume, size);
+ 	/* Call real ubi create volume */
+-	return ubi_create_volume(ubi, &req);
++	return -ubi_create_volume(ubi, &req);
+ }
+ 
+ struct ubi_volume *ubi_find_volume(char *volume)
