@@ -1,0 +1,57 @@
+--- a/src/dhcpv6.c
++++ b/src/dhcpv6.c
+@@ -384,7 +384,8 @@ static void dhcpv6_send(enum dhcpv6_msg
+ 			struct dhcpv6_ia_prefix pref = {
+ 				.type = htons(DHCPV6_OPT_IA_PREFIX),
+ 				.len = htons(sizeof(pref) - 4),
+-				.prefix = request_prefixes[i].length
++				.prefix = request_prefixes[i].length,
++				.addr = request_prefixes[i].address
+ 			};
+ 			memcpy(ia_pd + ia_pd_len, &hdr_ia_pd, sizeof(hdr_ia_pd));
+ 			ia_pd_len += sizeof(hdr_ia_pd);
+--- a/src/odhcp6c.c
++++ b/src/odhcp6c.c
+@@ -241,17 +241,29 @@ int main(_unused int argc, char* const a
+ 			if (allow_slaac_only >= 0 && allow_slaac_only < 10)
+ 				allow_slaac_only = 10;
+ 
++			struct odhcp6c_request_prefix prefix = { 0, 0, IN6ADDR_ANY_INIT };
++
++			char *length_begin;
+ 			char *iaid_begin;
+ 			int iaid_len = 0;
+-			int prefix_length = strtoul(optarg, &iaid_begin, 10);
++			if ((length_begin = strchr(optarg, '/'))) {
++				*length_begin = '\0';
++				if (inet_pton(AF_INET6, optarg, &prefix.address) != 1) {
++					*length_begin = '/';
++					syslog(LOG_ERR, "invalid argument: '%s'", optarg);
++					return 1;
++				}
++				*length_begin++ = '/';
++			} else
++				length_begin = optarg;
++
++			prefix.length = strtoul(length_begin, &iaid_begin, 10);
+ 
+ 			if (*iaid_begin != '\0' && *iaid_begin != ',' && *iaid_begin != ':') {
+ 				syslog(LOG_ERR, "invalid argument: '%s'", optarg);
+ 				return 1;
+ 			}
+ 
+-			struct odhcp6c_request_prefix prefix = { 0, prefix_length };
+-
+ 			if (*iaid_begin == ',' && (iaid_len = strlen(iaid_begin)) > 1)
+ 				memcpy(&prefix.iaid, iaid_begin + 1, iaid_len > 4 ? 4 : iaid_len);
+ 			else if (*iaid_begin == ':')
+--- a/src/odhcp6c.h
++++ b/src/odhcp6c.h
+@@ -368,6 +368,7 @@ struct odhcp6c_entry {
+ struct odhcp6c_request_prefix {
+ 	uint32_t iaid;
+ 	uint16_t length;
++	struct in6_addr address;
+ };
+ 
+ enum odhcp6c_opt_flags {
