@@ -51,12 +51,8 @@ DEFAULT_PACKAGES.tweak:=\
 	default-settings-chn \
 	kmod-nf-nathelper \
 	kmod-nf-nathelper-extra \
-	luci-light \
-	luci-app-cpufreq \
-	luci-app-opkg \
 	luci-compat \
-	luci-lib-base \
-	luci-lib-ipkg
+	luci-nginx
 
 ifneq ($(DUMP),)
   all: dumpinfo
@@ -134,7 +130,7 @@ endif
 DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.$(DEVICE_TYPE))
 
 # Add tweaked packages
-# DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)
+DEFAULT_PACKAGES += $(DEFAULT_PACKAGES.tweak)
 
 filter_packages = $(filter-out -% $(patsubst -%,%,$(filter -%,$(1))),$(1))
 extra_packages = $(if $(filter wpad wpad-% nas,$(1)),iwinfo)
