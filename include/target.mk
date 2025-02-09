@@ -66,11 +66,9 @@ DEFAULT_PACKAGES.tweak:=\
 	default-settings-chn \
 	kmod-nf-nathelper \
 	kmod-nf-nathelper-extra \
-	luci-light \
-	luci-app-package-manager \
+	luci-nginx \
+	luci-app-cpufreq \
 	luci-compat \
-	luci-lib-base \
-	luci-lib-ipkg
 
 ifneq ($(DUMP),)
   all: dumpinfo
