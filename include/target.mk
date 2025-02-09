@@ -63,7 +63,7 @@ DEFAULT_PACKAGES.tweak:=\
 	block-mount \
 	default-settings-chn \
 	kmod-nf-nathelper \
-	luci
+	luci-nginx
 
 ifneq ($(DUMP),)
   all: dumpinfo
